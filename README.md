@@ -48,8 +48,8 @@ json
 GET /result?id=<task_id>
 
 Пример запроса:
-```
 bash
+```
 curl http://localhost:8080/result?id=<task_id>
 ```
 Ответ:
