@@ -38,9 +38,18 @@ func (t *TaskManagerService) StartTask() *pkg.Task {
 		log.Println("Task with id =", taskId, "started")
 		time.Sleep(time.Duration((rand.Int63n(3) + 3) * int64(time.Minute)))
 		task.Status = "finished"
-		task.Result = "result is 25"
+		task.Result = "this is result of your task"
 		log.Println("Task with id = ", taskId, "finished")
 	}()
 
 	return task
+}
+
+func (t *TaskManagerService) GetTaskResult(id int) (string, error) {
+	task, err := t.store.GetTask(id)
+	if err != nil {
+		return "", err
+	}
+
+	return task.Result, err
 }

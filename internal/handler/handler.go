@@ -19,6 +19,7 @@ func NewHandler(service TaskService) *Handler {
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/status", h.GetStatusHandler).Methods(http.MethodGet)
+	router.HandleFunc("/result", h.GetResultHandler).Methods(http.MethodGet)
 	router.HandleFunc("/newtask", h.PostTaskHandler).Methods(http.MethodPost)
 }
 
@@ -37,10 +38,28 @@ func (h *Handler) GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pkg.WriteJson(w, http.StatusOK, map[string]string{"status": status})
+	pkg.WriteJson(w, http.StatusOK, map[string]any{"id": taskId, "status": status})
 }
 
 func (h *Handler) PostTaskHandler(w http.ResponseWriter, r *http.Request) {
 	task := h.taskService.StartTask()
 	pkg.WriteJson(w, http.StatusOK, task)
+}
+
+func (h *Handler) GetResultHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+
+	taskId, err := strconv.Atoi(id)
+	if err != nil {
+		pkg.WriteError(w, http.StatusBadRequest, errors.New("sent id is not number"))
+		return
+	}
+
+	result, err := h.taskService.GetTaskResult(taskId)
+	if err != nil {
+		pkg.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	pkg.WriteJson(w, http.StatusOK, map[string]any{"id": taskId, "result": result})
 }
